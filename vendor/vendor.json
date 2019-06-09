@@ -1,0 +1,174 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "vTImCU54mABoorsGoNHUvZnrr70=",
+			"path": "github.com/davyxu/golexer",
+			"revision": "f048a86ae2007c25258b5c5fa81f96114501f8dc",
+			"revisionTime": "2018-03-14T09:12:52Z"
+		},
+		{
+			"checksumSHA1": "6bS9+KyLbAJGbkbFBzvxQ2sq46I=",
+			"path": "github.com/davyxu/golog",
+			"revision": "5febd4fd5c33145b65ef741278750e3f47881efd",
+			"revisionTime": "2019-05-06T09:30:30Z"
+		},
+		{
+			"checksumSHA1": "RVY0fL0REwCxxUiNVh0xzif7AN4=",
+			"path": "github.com/davyxu/tabtoy/util",
+			"revision": "a6595c09aa649b2e0e46514c7f00dfac3b6cacc4",
+			"revisionTime": "2019-06-05T02:18:09Z"
+		},
+		{
+			"checksumSHA1": "Cxs55W633z7uaQt2F3fwI6f3DUk=",
+			"path": "github.com/davyxu/tabtoy/v2/i18n",
+			"revision": "a6595c09aa649b2e0e46514c7f00dfac3b6cacc4",
+			"revisionTime": "2019-06-05T02:18:09Z"
+		},
+		{
+			"checksumSHA1": "CabpF/4cZOq9MjYjlxZKfNKKpPk=",
+			"path": "github.com/davyxu/tabtoy/v2/model",
+			"revision": "a6595c09aa649b2e0e46514c7f00dfac3b6cacc4",
+			"revisionTime": "2019-06-05T02:18:09Z"
+		},
+		{
+			"checksumSHA1": "ZsYJLA2XJ9C9KLIaY33Mdh+MJLM=",
+			"path": "github.com/gogo/protobuf/proto",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "Y27Agdpf4FN4HGANJ8cp8+Q6VO4=",
+			"path": "github.com/golang/glog",
+			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
+			"revisionTime": "2016-01-25T20:49:56Z"
+		},
+		{
+			"checksumSHA1": "VlKnrNaNnLRuVXM6r2HoZvdt79c=",
+			"path": "github.com/golang/protobuf/jsonpb",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "NPJIM7sd6BEGbQ/NkraNftcRXj8=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "NmOpWW+Eg+Na/v2K/PIzybRV8gM=",
+			"path": "github.com/golang/protobuf/protoc-gen-go/descriptor",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "WS4ItT1lMYb3ZEcHbcFe7PxYI3I=",
+			"path": "github.com/golang/protobuf/protoc-gen-go/plugin",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "JyoHmA6gvkeNXMqgQ6ICvCUFSyk=",
+			"path": "github.com/golang/protobuf/ptypes/any",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "xDgNqtpOk125juDSClIsxUHO4tA=",
+			"path": "github.com/golang/protobuf/ptypes/duration",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "833XIjV1A1bo7mFjZMedknySlpo=",
+			"path": "github.com/golang/protobuf/ptypes/empty",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "rcRK3jWVPMOJ3ykn1ILh+UkY67E=",
+			"path": "github.com/golang/protobuf/ptypes/struct",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "q0ZFdjrBcCsz2Eg5y/UBsQLICAQ=",
+			"path": "github.com/golang/protobuf/ptypes/timestamp",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "TSN+851ianBtZ6tuTIg/XI/1M1k=",
+			"path": "github.com/golang/protobuf/ptypes/wrappers",
+			"revision": "b285ee9cfc6c881bb20c0d8dc73370ea9b9ec90f",
+			"revisionTime": "2019-05-17T06:12:10Z"
+		},
+		{
+			"checksumSHA1": "/eIDPPnfV1Um8a213lZBSxWcojA=",
+			"path": "github.com/jhump/protoreflect/desc",
+			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",
+			"revisionTime": "2019-06-06T03:37:55Z"
+		},
+		{
+			"checksumSHA1": "wtcWoXtXfTEHjuvdxnuOOaPyOH0=",
+			"path": "github.com/jhump/protoreflect/desc/builder",
+			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",
+			"revisionTime": "2019-06-06T03:37:55Z"
+		},
+		{
+			"checksumSHA1": "IlPWZc2pYhsVD/y7lN5qJK1IQWk=",
+			"path": "github.com/jhump/protoreflect/desc/internal",
+			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",
+			"revisionTime": "2019-06-06T03:37:55Z"
+		},
+		{
+			"checksumSHA1": "hFGNaTZU2ph8/GOpWHBgOo7UujA=",
+			"path": "github.com/jhump/protoreflect/desc/protoparse",
+			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",
+			"revisionTime": "2019-06-06T03:37:55Z"
+		},
+		{
+			"checksumSHA1": "HS/QCvjpnd4xRrYpj4xb2mbhLvs=",
+			"path": "github.com/jhump/protoreflect/dynamic",
+			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",
+			"revisionTime": "2019-06-06T03:37:55Z"
+		},
+		{
+			"checksumSHA1": "wbH1+jRrXTd3awWxSpHYHM+hEQ8=",
+			"path": "github.com/jhump/protoreflect/internal",
+			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",
+			"revisionTime": "2019-06-06T03:37:55Z"
+		},
+		{
+			"checksumSHA1": "iyrcXpcXpgYFN7CMT4IY1T1Q29s=",
+			"path": "github.com/tealeg/xlsx",
+			"revision": "e2d23f3c43dc758fca2d02d6f0052ba3d4f80e19",
+			"revisionTime": "2019-06-01T07:16:28Z"
+		},
+		{
+			"checksumSHA1": "r9SnQr4LYoIqeJjcv1KmnlIrEOQ=",
+			"path": "google.golang.org/genproto/protobuf/api",
+			"revision": "eb0b1bdb6ae60fcfc41b8d907b50dfb346112301",
+			"revisionTime": "2019-06-05T22:03:51Z"
+		},
+		{
+			"checksumSHA1": "zVaQefpGcza3p7pZ5aKQUx/0PtU=",
+			"path": "google.golang.org/genproto/protobuf/field_mask",
+			"revision": "eb0b1bdb6ae60fcfc41b8d907b50dfb346112301",
+			"revisionTime": "2019-06-05T22:03:51Z"
+		},
+		{
+			"checksumSHA1": "X63AZ+53HiDjO1NPNtQBvBrx0Vg=",
+			"path": "google.golang.org/genproto/protobuf/ptype",
+			"revision": "eb0b1bdb6ae60fcfc41b8d907b50dfb346112301",
+			"revisionTime": "2019-06-05T22:03:51Z"
+		},
+		{
+			"checksumSHA1": "dCRdJWNflbsxolIQXzTsCodAVmI=",
+			"path": "google.golang.org/genproto/protobuf/source_context",
+			"revision": "eb0b1bdb6ae60fcfc41b8d907b50dfb346112301",
+			"revisionTime": "2019-06-05T22:03:51Z"
+		}
+	],
+	"rootPath": "github.com/821869798/excelconvert"
+}
