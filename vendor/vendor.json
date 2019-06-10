@@ -128,6 +128,12 @@
 			"revisionTime": "2019-06-06T03:37:55Z"
 		},
 		{
+			"checksumSHA1": "vsMlSFgdrltB98W5xH5+q8V+v1A=",
+			"path": "github.com/jhump/protoreflect/desc/protoprint",
+			"revision": "af618f5b4cc4a322d8e8e99a568d6d41a574ee18",
+			"revisionTime": "2019-06-09T03:53:12Z"
+		},
+		{
 			"checksumSHA1": "HS/QCvjpnd4xRrYpj4xb2mbhLvs=",
 			"path": "github.com/jhump/protoreflect/dynamic",
 			"revision": "27593fda7dd234c9e3c8f9852054b0041e94caa3",

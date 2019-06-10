@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"github.com/821869798/excelconvert/converter"
 	"github.com/821869798/excelconvert/excel"
+	"github.com/821869798/excelconvert/model"
+	"github.com/821869798/excelconvert/util"
 	_ "github.com/gogo/protobuf/proto"
 	"github.com/golang/glog"
 	_ "github.com/jhump/protoreflect/desc/builder"
 	_ "github.com/jhump/protoreflect/desc/protoparse"
 	_ "github.com/tealeg/xlsx"
 	"os"
+	"path/filepath"
 )
 
 func Entry() {
@@ -18,12 +21,35 @@ func Entry() {
 
 	g.ProtoVersion = *paramProtoVersion
 
-	g.InputFileList = flag.Arg(0)
+	//添加输入文件或者文件夹
+	if *paramDirInputMode {
+		for _, v := range flag.Args() {
+			fileLists, err := util.GetExcellist(v)
+			if err != nil {
+				_, _ = fmt.Fprintln(os.Stderr, "\n", v, ":not a correct dir input!")
+				return
+			}
+			g.InputFileList = append(g.InputFileList, fileLists...)
+		}
+	} else {
+		for _, v := range flag.Args() {
+			g.InputFileList = append(g.InputFileList, v)
+		}
+	}
+
+	//test
+	*paramProtoOut = `E:\program\gopath\src\github.com\821869798\excelconvert\example\protos`
+	*paramPbBinaryOut = `E:\program\gopath\src\github.com\821869798\excelconvert\example\bytes`
+	g.InputFileList = append(g.InputFileList, `E:\program\gopath\src\github.com\821869798\excelconvert\example\example.xlsx`)
+
+	if len(g.InputFileList) == 0 {
+		usage()
+		_, _ = fmt.Fprintln(os.Stderr, "\nnot a excel file input!")
+		return
+	}
 
 	if *paramProtoOut != "" && *paramPbBinaryOut != "" {
 		g.AddOutputType("proto", &converter.ProtoArgs{
-			PackageName: *paramPackageName,
-			TableName:   *paramTableName,
 			ProtoOut:    *paramProtoOut,
 			PbBinaryOut: *paramPbBinaryOut,
 		})
@@ -41,20 +67,56 @@ func Entry() {
 
 func StartExport(g *converter.Globals) bool {
 
-	glog.Info("==========%s==========", "开始导出")
+	glog.Infof("==========%s==========", "开始导出")
 	//g.InputFileList
 
-	file := excel.NewFile(g.InputFileList)
-	if file == nil {
-		return false
+	fileObjList := make([]*excel.File, 0)
+
+	for _, inputFile := range g.InputFileList {
+		file := excel.NewFile(inputFile)
+		if file == nil {
+			return false
+		}
+
+		file.GlobalFD = g.FileDescriptor
+
+		// 电子表格数据导出到Table对象
+		if !file.ExportLocalType() {
+			return false
+		}
+
+		// 整合类型信息和数据
+		if !g.AddTypes(file.LocalFD) {
+			return false
+		}
+
+		fileObjList = append(fileObjList, file)
 	}
 
-	file.GlobalFD = g.FileDescriptor
+	for _, file := range fileObjList {
+		glog.Infoln(filepath.Base(file.FileName))
+		dataModel := model.NewDataModel()
 
-	// 电子表格数据导出到Table对象
-	if !file.ExportLocalType() {
-		return false
+		tab := model.NewTable()
+		tab.LocalFD = file.LocalFD
+
+		// 主表
+		if !file.ExportData(dataModel, nil) {
+			return false
+		}
+
+		// 合并所有值到node节点
+		if !excel.MergeValues(dataModel, tab, file) {
+			return false
+		}
+
+		// 整合类型信息和数据
+		if !g.AddContent(tab) {
+			return false
+		}
+
 	}
 
-	return false
+	// 根据各种导出类型, 调用各导出器导出
+	return g.Convert()
 }

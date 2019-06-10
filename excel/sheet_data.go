@@ -1,9 +1,8 @@
 package excel
 
 import (
-	"github.com/davyxu/tabtoy/util"
-	"github.com/davyxu/tabtoy/v2/i18n"
-	"github.com/davyxu/tabtoy/v2/model"
+	"github.com/821869798/excelconvert/model"
+	"github.com/821869798/excelconvert/util"
 	"github.com/golang/glog"
 	"strings"
 )
@@ -66,7 +65,7 @@ func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel, da
 			if meetEmptyLine && !warningAfterEmptyLineDataOnce {
 				r, _ := self.GetRC()
 
-				log.Warnf("%s %s|%s(%s)", i18n.String(i18n.DataSheet_RowDataSplitedByEmptyLine), self.file.FileName, self.Name, util.R1C1ToA1(r, 1))
+				glog.Warningf("%s %s|%s(%s)", "数据表: 空行后依然有数据没有导出", self.file.FileName, self.Name, util.R1C1ToA1(r, 1))
 
 				warningAfterEmptyLineDataOnce = true
 			}
@@ -86,7 +85,7 @@ func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel, da
 			fieldDef, ok := fieldDefGetter(self.Column, dataHeader, parentHeader)
 
 			if !ok {
-				log.Errorf("%s %s|%s(%s)", i18n.String(i18n.DataHeader_FieldNotDefinedInMainTableInMultiTableMode), self.file.FileName, self.Name, util.R1C1ToA1(self.Row+1, self.Column+1))
+				glog.Errorf("%s %s|%s(%s)", "数据头: 多表格导出时, 子表中的字段在母表中没有定义", self.file.FileName, self.Name, util.R1C1ToA1(self.Row+1, self.Column+1))
 				return false
 			}
 
@@ -200,7 +199,7 @@ func mustFillCheck(fd *model.FieldDescriptor, raw string) bool {
 	if fd.Meta.GetBool("MustFill") {
 
 		if raw == "" {
-			glog.Error("%s, %s", "数据表: 单元格必须被填充", fd.String())
+			glog.Errorf("%s, %s", "数据表: 单元格必须被填充", fd.String())
 			return false
 		}
 	}
@@ -213,4 +212,82 @@ func newDataSheet(sheet *Sheet) *DataSheet {
 	return &DataSheet{
 		Sheet: sheet,
 	}
+}
+
+const (
+	ColumnMajor_RowDataBegin = 1
+	ColumnMajor_ColumnValue  = 4
+)
+
+// 导出适合配置格式的表格
+func (self *DataSheet) exportColumnMajor(file *File, dataModel *model.DataModel, dataHeader, parentHeader *DataHeader) bool {
+
+	// 是否继续读行
+	var readingLine bool = true
+
+	var meetEmptyLine bool
+
+	var warningAfterEmptyLineDataOnce bool
+
+	line := model.NewLineData()
+
+	for self.Row = ColumnMajor_RowDataBegin; readingLine; self.Row++ {
+		// 整行都是空的
+		if self.IsFullRowEmpty(self.Row, dataHeader.RawFieldCount()) {
+
+			// 再次碰空行, 表示确实是空的
+			if meetEmptyLine {
+				break
+
+			} else {
+				meetEmptyLine = true
+			}
+
+			continue
+
+		} else {
+
+			//已经碰过空行, 这里又碰到数据, 说明有人为隔出的空行, 做warning提醒, 防止数据没导出
+			if meetEmptyLine && !warningAfterEmptyLineDataOnce {
+				r, _ := self.GetRC()
+
+				glog.Warningf("%s %s|%s(%s)", "数据表: 空行后依然有数据没有导出", self.file.FileName, self.Name, util.R1C1ToA1(r, 1))
+
+				warningAfterEmptyLineDataOnce = true
+			}
+
+		}
+
+		fieldDef := dataHeader.RawField(self.Row - ColumnMajor_RowDataBegin)
+
+		// 数据大于列头时, 结束这个列
+		if fieldDef == nil {
+			break
+		}
+
+		// #开头表示注释, 跳过
+		if strings.Index(fieldDef.Name, "#") == 0 {
+			continue
+		}
+
+		rawValue := self.GetCellData(self.Row, ColumnMajor_ColumnValue)
+
+		r, c := self.GetRC()
+
+		line.Add(&model.FieldValue{
+			FieldDef:           fieldDef,
+			RawValue:           rawValue,
+			SheetName:          self.Name,
+			FileName:           self.file.FileName,
+			R:                  r,
+			C:                  c,
+			FieldRepeatedCount: dataHeader.FieldRepeatedCount(fieldDef),
+		})
+
+	}
+
+	dataModel.Add(line)
+
+	return true
+
 }

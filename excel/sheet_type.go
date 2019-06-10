@@ -1,8 +1,9 @@
 package excel
 
 import (
+	"github.com/821869798/excelconvert/model"
 	"github.com/davyxu/tabtoy/util"
-	"github.com/davyxu/tabtoy/v2/i18n"
+	"github.com/golang/glog"
 )
 
 const (
@@ -78,7 +79,7 @@ func (self *TypeSheet) parseTable(root *typeModelRoot) bool {
 
 			//已经碰过空行, 这里又碰到数据, 说明有人为隔出的空行, 做warning提醒, 防止数据没导出
 			if meetEmptyLine && !warningAfterEmptyLineDataOnce {
-				log.Errorf("%s %s|%s(%s)", i18n.String(i18n.TypeSheet_RowDataSplitedByEmptyLine), self.file.FileName, self.Name, util.R1C1ToA1(row, 1))
+				glog.Warningf("%s %s|%s(%s)", "类型表: 空行后依然有数据没有导出", self.file.FileName, self.Name, util.R1C1ToA1(row, 1))
 
 				warningAfterEmptyLineDataOnce = true
 			}
@@ -94,7 +95,7 @@ func (self *TypeSheet) parseTable(root *typeModelRoot) bool {
 			if _, ok := typeHeader[typeDeclare]; !ok {
 				self.Row = TypeSheetRow_FieldDesc
 				self.Column = col
-				log.Errorf("%s, '%s'", i18n.String(i18n.TypeSheet_UnexpectedTypeHeader), typeDeclare)
+				glog.Errorf("%s, '%s'", "类型表: 非期望的类型表头名", typeDeclare)
 				return false
 			}
 
@@ -104,7 +105,7 @@ func (self *TypeSheet) parseTable(root *typeModelRoot) bool {
 			if typeDeclare == "ObjectType" && typeValue == "" {
 				self.Row = row
 				self.Column = col
-				log.Errorf("%s", i18n.String(i18n.TypeSheet_ObjectNameEmpty))
+				glog.Errorf("%s", "类型表: 'ObjectName'字段不能为空")
 				return false
 			}
 
@@ -136,7 +137,7 @@ func (self *TypeSheet) Parse(localFD *model.FileDescriptor, globalFD *model.File
 	if !root.ParsePragma(localFD) {
 		self.Row = TypeSheetRow_Pragma
 		self.Column = 0
-		log.Errorf("%s", i18n.String(i18n.TypeSheet_PackageIsEmpty))
+		glog.Errorf("%s", "类型表: 包名(Package)为空")
 		goto ErrorStop
 	}
 
@@ -158,7 +159,7 @@ ErrorStop:
 
 	r, c := self.GetRC()
 
-	log.Errorf("%s|%s(%s)", self.file.FileName, self.Name, util.R1C1ToA1(r, c))
+	glog.Errorf("%s|%s(%s)", self.file.FileName, self.Name, util.R1C1ToA1(r, c))
 	return false
 }
 
@@ -170,7 +171,7 @@ func (self *TypeSheet) checkProtobufCompatibility(fileD *model.FileDescriptor) b
 
 			// proto3 需要枚举有0值
 			if _, ok := bt.FieldByNumber[0]; !ok {
-				log.Errorf("%s, '%s'", i18n.String(i18n.TypeSheet_FirstEnumValueShouldBeZero), bt.Name)
+				glog.Errorf("%s, '%s'", "类型表: 第一个枚举值必须为0", bt.Name)
 				return false
 			}
 		}

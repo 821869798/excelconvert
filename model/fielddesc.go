@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"strings"
 )
 
@@ -135,7 +136,7 @@ func (self *FieldDescriptor) DefaultValue() string {
 	case FieldType_Enum:
 
 		if self.Complex == nil {
-			log.Debugln("build type null while get default value", self.Name)
+			glog.Info("build type null while get default value", self.Name)
 			return ""
 		}
 
