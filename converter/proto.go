@@ -6,6 +6,8 @@ import (
 	"github.com/golang/glog"
 	"github.com/jhump/protoreflect/desc/builder"
 	"github.com/jhump/protoreflect/desc/protoprint"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -87,14 +89,23 @@ func (self *protoConverter) Run(g *Globals, args interface{}) bool {
 		}
 
 		fd, err := file.Build()
+		if err != nil {
+			glog.Errorf("%s%s", "导出Proto结构报错:", fileName)
+			return false
+		}
 		var buf bytes.Buffer
-		err := pr.PrintProtoFile(fd, &buf)
-		pr.PrintProtoFile(fd, &buf)
-		glog.Errorln(fd.AsProto().String())
+		err = pr.PrintProtoFile(fd, &buf)
 		if err != nil {
 			glog.Errorf("%s%s", "导出Proto文件报错:", fileName)
 			return false
 		}
+		parentPath := filepath.Dir(fileName)
+		_ = os.MkdirAll(parentPath, os.ModePerm)
+		err = ioutil.WriteFile(fileName, buf.Bytes(), 0777)
+		if err != nil {
+			glog.Errorln("%s%s", "写入Proto文件报错:", fileName)
+		}
+
 	}
 
 	//for _, d := range g.FileDescriptor.Descriptors {

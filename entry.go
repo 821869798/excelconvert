@@ -38,9 +38,9 @@ func Entry() {
 	}
 
 	//test
-	*paramProtoOut = `E:\program\gopath\src\github.com\821869798\excelconvert\example\protos`
-	*paramPbBinaryOut = `E:\program\gopath\src\github.com\821869798\excelconvert\example\bytes`
-	g.InputFileList = append(g.InputFileList, `E:\program\gopath\src\github.com\821869798\excelconvert\example\example.xlsx`)
+	*paramProtoOut = `./example/protos`
+	*paramPbBinaryOut = `./example/bytes`
+	g.InputFileList = append(g.InputFileList, `./example/example.xlsx`)
 
 	if len(g.InputFileList) == 0 {
 		usage()
