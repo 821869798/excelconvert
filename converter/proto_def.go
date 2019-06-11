@@ -50,20 +50,20 @@ func buildOneProtoFiler(g *Globals, protoOutPath string, localFD *model.FileDesc
 
 	pfd, err := file.Build()
 	if err != nil {
-		glog.Errorf("%s%s", "导出Proto结构报错:", localFD.Name)
+		glog.Errorf("%s%s,%v", "导出Proto结构报错:", localFD.Name, err.Error())
 		return false, nil
 	}
 	var buf bytes.Buffer
 	err = pr.PrintProtoFile(pfd, &buf)
 	if err != nil {
-		glog.Errorf("%s%s", "导出Proto文件报错:", localFD.Name)
+		glog.Errorf("%s%s,%v", "导出Proto文件报错:", localFD.Name, err.Error())
 		return false, nil
 	}
 	parentPath := filepath.Dir(fileName)
 	_ = os.MkdirAll(parentPath, os.ModePerm)
 	err = ioutil.WriteFile(fileName, buf.Bytes(), 0777)
 	if err != nil {
-		glog.Errorln("%s%s", "写入Proto文件报错:", localFD.Name)
+		glog.Errorln("%s%s,%v", "写入Proto文件报错:", localFD.Name, err.Error())
 	}
 
 	return true, pfd

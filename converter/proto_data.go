@@ -4,36 +4,56 @@ import (
 	"fmt"
 	"github.com/821869798/excelconvert/model"
 	"github.com/gogo/protobuf/proto"
+	"github.com/golang/glog"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
 func buildOneBytesFile(tab *model.Table, PbBinaryOutPath string, pfd *desc.FileDescriptor) bool {
 	localFD := tab.LocalFD
+	baseName := localFD.Name + ".bytes"
+	fileName := filepath.Join(PbBinaryOutPath, baseName)
 	//List数据的结构
-	gourpMsg := pfd.FindMessage(fmt.Sprintf("%s.%sTalbe", localFD.Package, localFD.Name))
+	gourpMsg := pfd.FindMessage(fmt.Sprintf("%s.%sTable", localFD.Package, localFD.Name))
 	gourpDM := dynamic.NewMessage(gourpMsg)
 	//单条记录的结构
 	recordMsg := pfd.FindMessage(fmt.Sprintf("%s.%s", localFD.Package, localFD.Name))
 
-	for i, r := range tab.Recs {
+	for _, r := range tab.Recs {
 		recordDM := dynamic.NewMessage(recordMsg)
 		for _, node := range r.Nodes {
 			if node.Type != model.FieldType_Struct {
 				if node.IsRepeated {
-					for index, valueNode := range node.Child {
-						recordDM.SetRepeatedFieldByName(node.Name, index, getBuildPBValue(node.Type, valueNode))
+					for _, valueNode := range node.Child {
+						recordDM.AddRepeatedFieldByName(node.Name, getBuildPBValue(node.Type, valueNode))
 					}
 				} else {
-					recordDM.SetFieldByName(node.Name, getBuildPBValue(node.Type, node))
+					recordDM.SetFieldByName(node.Name, getBuildPBValue(node.Type, node.Child[0]))
 				}
 			} else {
 				return false
 			}
 		}
-		gourpDM.SetRepeatedFieldByNumber(1, i, recordDM)
+		gourpDM.AddRepeatedFieldByNumber(1, recordDM)
 	}
+	buf, err := gourpDM.Marshal()
+
+	if err != nil {
+		glog.Errorf("序列化Proto二进制数据错误:%s,%v", localFD.Name, err.Error())
+		return false
+	}
+
+	parentPath := filepath.Dir(fileName)
+	_ = os.MkdirAll(parentPath, os.ModePerm)
+	err = ioutil.WriteFile(fileName, buf, 0777)
+	if err != nil {
+		glog.Errorf("%s%s", "写入Proto二进制数据文件错误:%s,%v", localFD.Name, err.Error())
+	}
+
 	return true
 }
 

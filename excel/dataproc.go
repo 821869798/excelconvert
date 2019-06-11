@@ -53,8 +53,6 @@ func coloumnProcessor(file model.GlobalChecker, record *model.Record, fd *model.
 			node = node.AddKey(fd)
 		}
 
-		node.SugguestIgnore = sugguestIgnore
-
 		if !dataProcessor(file, fd, raw, node) {
 			return false
 		}

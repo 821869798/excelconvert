@@ -98,7 +98,6 @@ func StartExport(g *converter.Globals) bool {
 		tab.LocalFD = file.LocalFD
 		file.LocalFD.Table = tab
 
-		// 主表
 		if !file.ExportData(dataModel) {
 			return false
 		}
