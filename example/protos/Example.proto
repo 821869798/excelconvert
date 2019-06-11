@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package table;
+
+message Example {
+  optional int64 id = 1;
+
+  optional string name = 2;
+}
+
+message ExampleTable {
+  repeated Example ExampleList = 1;
+}

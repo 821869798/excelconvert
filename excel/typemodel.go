@@ -77,7 +77,8 @@ func (self *typeModelRoot) ParseData(localFD *model.FileDescriptor, globalFD *mo
 
 	var td *model.Descriptor
 
-	reservedRowFieldTypeName := localFD.Pragma.GetString("TableName") + "Define"
+	reservedRowFieldType1 := localFD.Pragma.GetString("TableName")
+	reservedRowFieldType2 := reservedRowFieldType1 + "Group"
 
 	// 每一行
 	for _, m := range self.models {
@@ -88,8 +89,8 @@ func (self *typeModelRoot) ParseData(localFD *model.FileDescriptor, globalFD *mo
 
 		rawTypeName, self.Col = m.getValue("ObjectType")
 
-		if rawTypeName == reservedRowFieldTypeName {
-			glog.Error("%s '%s'", "数据头: 使用了保留的类型名 例如:表名+'Define'", rawTypeName)
+		if rawTypeName == reservedRowFieldType1 || rawTypeName == reservedRowFieldType2 {
+			glog.Error("%s '%s'", "数据头: 使用了保留的类型名 例如:表名或者表名+Group", rawTypeName)
 			return false
 		}
 

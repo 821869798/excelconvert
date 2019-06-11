@@ -3,14 +3,12 @@ package excel
 import (
 	"github.com/821869798/excelconvert/model"
 	"github.com/golang/glog"
-	"strings"
 )
 
 type DataHeaderElement struct {
 	FieldName string
 	FieldType string
 	FieldMeta string
-	Comment   string
 }
 
 func checkElement(def *model.FieldDescriptor) int {
@@ -97,8 +95,6 @@ func (self *DataHeaderElement) Parse(def *model.FieldDescriptor, localFD *model.
 		glog.Errorf("%s '%s'", "数据头: 特性解析错误", err)
 		return DataSheetHeader_FieldMeta
 	}
-
-	def.Comment = strings.Replace(self.Comment, "\n", " ", -1)
 
 	// 根据字段名查找, 处理repeated字段case
 	exist, ok := headerByName[def.Name]

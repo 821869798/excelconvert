@@ -19,9 +19,8 @@ type File struct {
 	GlobalFD *model.FileDescriptor // 全局的类型描述表
 	coreFile *xlsx.File
 
-	dataSheets  []*DataSheet
-	Header      *DataHeader
-	dataHeaders []*DataHeader
+	Header *DataHeader
+	Data   *DataSheet
 
 	valueRepByKey map[valueRepeatData]bool // 检查单元格值重复map
 }
@@ -91,39 +90,30 @@ func (self *File) ExportLocalType() bool {
 			dataHeader := newDataHeadSheet()
 
 			// 检查引导头
-			if !dataHeader.ParseProtoField(len(self.dataSheets), dSheet.Sheet, self.LocalFD, self.GlobalFD) {
+			if !dataHeader.ParseProtoField(dSheet.Sheet, self.LocalFD, self.GlobalFD) {
 				return false
 			}
 
-			if self.Header == nil {
-				self.Header = dataHeader
-			}
+			self.Header = dataHeader
+			self.Data = dSheet
 
-			self.dataHeaders = append(self.dataHeaders, dataHeader)
-			self.dataSheets = append(self.dataSheets, dSheet)
+			break
 		}
 	}
 
 	// File描述符的名字必须放在类型里, 因为这里始终会被调用, 但是如果数据表缺失, 是不会更新Name的
 	self.LocalFD.Name = self.LocalFD.Pragma.GetString("TableName")
+	self.LocalFD.Package = self.LocalFD.Pragma.GetString("Package")
 
 	return true
 }
 
-func (self *File) ExportData(dataModel *model.DataModel, parentHeader *DataHeader) bool {
+func (self *File) ExportData(dataModel *model.DataModel) bool {
 
-	for index, d := range self.dataSheets {
+	glog.Infof("            %s", self.Data.Name)
 
-		glog.Infof("            %s", d.Name)
-
-		// 多个sheet时, 使用和多文件一样的父级
-		if parentHeader == nil && len(self.dataHeaders) > 1 {
-			parentHeader = self.dataHeaders[0]
-		}
-
-		if !d.Export(self, dataModel, self.dataHeaders[index], parentHeader) {
-			return false
-		}
+	if !self.Data.Export(self, dataModel) {
+		return false
 	}
 
 	return true

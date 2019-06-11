@@ -21,20 +21,20 @@ func (self *DataSheet) Valid() bool {
 	return self.GetCellData(0, 0) != ""
 }
 
-func (self *DataSheet) Export(file *File, dataModel *model.DataModel, dataHeader, parentHeader *DataHeader) bool {
+func (self *DataSheet) Export(file *File, dataModel *model.DataModel) bool {
 
 	verticalHeader := file.LocalFD.Pragma.GetBool("Vertical")
 
 	if verticalHeader {
-		return self.exportColumnMajor(file, dataModel, dataHeader, parentHeader)
+		return self.exportColumnMajor(file, dataModel)
 	} else {
-		return self.exportRowMajor(file, dataModel, dataHeader, parentHeader)
+		return self.exportRowMajor(file, dataModel)
 	}
 
 }
 
 // 导出以行数据延展的表格(普通表格)
-func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel, dataHeader, parentHeader *DataHeader) bool {
+func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel) bool {
 
 	// 是否继续读行
 	var readingLine bool = true
@@ -47,7 +47,7 @@ func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel, da
 	for self.Row = DataSheetHeader_DataBegin; readingLine; self.Row++ {
 
 		// 整行都是空的
-		if self.IsFullRowEmpty(self.Row, dataHeader.RawFieldCount()) {
+		if self.IsFullRowEmpty(self.Row, file.Header.RawFieldCount()) {
 
 			// 再次碰空行, 表示确实是空的
 			if meetEmptyLine {
@@ -80,16 +80,11 @@ func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel, da
 		line := model.NewLineData()
 
 		// 遍历每一列
-		for self.Column = 0; self.Column < dataHeader.RawFieldCount(); self.Column++ {
+		for self.Column = 0; self.Column < file.Header.RawFieldCount(); self.Column++ {
 
-			fieldDef, ok := fieldDefGetter(self.Column, dataHeader, parentHeader)
+			fieldDef := file.Header.RawField(self.Column)
 
-			if !ok {
-				glog.Errorf("%s %s|%s(%s)", "数据头: 多表格导出时, 子表中的字段在母表中没有定义", self.file.FileName, self.Name, util.R1C1ToA1(self.Row+1, self.Column+1))
-				return false
-			}
-
-			op := self.processLine(fieldDef, line, dataHeader)
+			op := self.processLine(fieldDef, line, file.Header)
 
 			if op == lineOp_Continue {
 				continue
@@ -99,28 +94,28 @@ func (self *DataSheet) exportRowMajor(file *File, dataModel *model.DataModel, da
 
 		}
 
-		// 是子表
-		if parentHeader != nil {
-
-			// 遍历母表所有的列头字段
-			for c := 0; c < parentHeader.RawFieldCount(); c++ {
-				fieldDef := parentHeader.RawField(c)
-
-				// 在子表中有对应字段的, 忽略, 只要没有的字段
-				if _, ok := dataHeader.HeaderByName[fieldDef.Name]; ok {
-					continue
-				}
-
-				op := self.processLine(fieldDef, line, dataHeader)
-
-				if op == lineOp_Continue {
-					continue
-				} else if op == lineOp_Break {
-					break
-				}
-
-			}
-		}
+		//// 是子表
+		//if parentHeader != nil {
+		//
+		//	// 遍历母表所有的列头字段
+		//	for c := 0; c < parentHeader.RawFieldCount(); c++ {
+		//		fieldDef := parentHeader.RawField(c)
+		//
+		//		// 在子表中有对应字段的, 忽略, 只要没有的字段
+		//		if _, ok := dataHeader.HeaderByName[fieldDef.Name]; ok {
+		//			continue
+		//		}
+		//
+		//		op := self.processLine(fieldDef, line, dataHeader)
+		//
+		//		if op == lineOp_Continue {
+		//			continue
+		//		} else if op == lineOp_Break {
+		//			break
+		//		}
+		//
+		//	}
+		//}
 
 		dataModel.Add(line)
 
@@ -177,19 +172,6 @@ func fieldDefGetter(index int, dataHeader, parentHeader *DataHeader) (*model.Fie
 		return nil, true
 	}
 
-	if parentHeader != nil {
-
-		if strings.Index(fieldDef.Name, "#") == 0 {
-			return fieldDef, true
-		}
-
-		ret, ok := parentHeader.HeaderByName[fieldDef.Name]
-		if !ok {
-			return nil, false
-		}
-		return ret, true
-	}
-
 	return fieldDef, true
 
 }
@@ -220,7 +202,7 @@ const (
 )
 
 // 导出适合配置格式的表格
-func (self *DataSheet) exportColumnMajor(file *File, dataModel *model.DataModel, dataHeader, parentHeader *DataHeader) bool {
+func (self *DataSheet) exportColumnMajor(file *File, dataModel *model.DataModel) bool {
 
 	// 是否继续读行
 	var readingLine bool = true
@@ -233,7 +215,7 @@ func (self *DataSheet) exportColumnMajor(file *File, dataModel *model.DataModel,
 
 	for self.Row = ColumnMajor_RowDataBegin; readingLine; self.Row++ {
 		// 整行都是空的
-		if self.IsFullRowEmpty(self.Row, dataHeader.RawFieldCount()) {
+		if self.IsFullRowEmpty(self.Row, file.Header.RawFieldCount()) {
 
 			// 再次碰空行, 表示确实是空的
 			if meetEmptyLine {
@@ -258,7 +240,7 @@ func (self *DataSheet) exportColumnMajor(file *File, dataModel *model.DataModel,
 
 		}
 
-		fieldDef := dataHeader.RawField(self.Row - ColumnMajor_RowDataBegin)
+		fieldDef := file.Header.RawField(self.Row - ColumnMajor_RowDataBegin)
 
 		// 数据大于列头时, 结束这个列
 		if fieldDef == nil {
@@ -281,7 +263,7 @@ func (self *DataSheet) exportColumnMajor(file *File, dataModel *model.DataModel,
 			FileName:           self.file.FileName,
 			R:                  r,
 			C:                  c,
-			FieldRepeatedCount: dataHeader.FieldRepeatedCount(fieldDef),
+			FieldRepeatedCount: file.Header.FieldRepeatedCount(fieldDef),
 		})
 
 	}

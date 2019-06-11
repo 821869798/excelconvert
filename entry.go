@@ -70,7 +70,7 @@ func StartExport(g *converter.Globals) bool {
 	glog.Infof("==========%s==========", "开始导出")
 	//g.InputFileList
 
-	fileObjList := make([]*excel.File, 0)
+	//fileObjList := make([]*excel.File, 0)
 
 	for _, inputFile := range g.InputFileList {
 		file := excel.NewFile(inputFile)
@@ -90,18 +90,16 @@ func StartExport(g *converter.Globals) bool {
 			return false
 		}
 
-		fileObjList = append(fileObjList, file)
-	}
-
-	for _, file := range fileObjList {
 		glog.Infoln(filepath.Base(file.FileName))
+		//开始解析数据
 		dataModel := model.NewDataModel()
 
 		tab := model.NewTable()
 		tab.LocalFD = file.LocalFD
+		file.LocalFD.Table = tab
 
 		// 主表
-		if !file.ExportData(dataModel, nil) {
+		if !file.ExportData(dataModel) {
 			return false
 		}
 
@@ -114,7 +112,6 @@ func StartExport(g *converter.Globals) bool {
 		if !g.AddContent(tab) {
 			return false
 		}
-
 	}
 
 	// 根据各种导出类型, 调用各导出器导出

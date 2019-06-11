@@ -18,7 +18,6 @@ const (
 	DataSheetHeader_FieldName = 0 // 字段名(对应proto)
 	DataSheetHeader_FieldType = 1 // 字段类型
 	DataSheetHeader_FieldMeta = 2 // 字段特性
-	DataSheetHeader_Comment   = 4 // 用户注释
 	DataSheetHeader_DataBegin = 5 // 数据开始
 )
 
@@ -35,7 +34,7 @@ type DataHeader struct {
 }
 
 // 检查字段行的长度
-func (self *DataHeader) ParseProtoField(index int, sheet *Sheet, localFD *model.FileDescriptor, globalFD *model.FileDescriptor) bool {
+func (self *DataHeader) ParseProtoField(sheet *Sheet, localFD *model.FileDescriptor, globalFD *model.FileDescriptor) bool {
 
 	verticalHeader := localFD.Pragma.GetBool("Vertical")
 
@@ -48,7 +47,6 @@ func (self *DataHeader) ParseProtoField(index int, sheet *Sheet, localFD *model.
 				FieldName: sheet.GetCellData(sheet.Row, DataSheetHeader_FieldName),
 				FieldType: sheet.GetCellData(sheet.Row, DataSheetHeader_FieldType),
 				FieldMeta: sheet.GetCellData(sheet.Row, DataSheetHeader_FieldMeta),
-				Comment:   sheet.GetCellData(sheet.Row, DataSheetHeader_Comment),
 			}
 
 			if he.FieldName == "" {
@@ -72,7 +70,6 @@ func (self *DataHeader) ParseProtoField(index int, sheet *Sheet, localFD *model.
 				FieldName: sheet.GetCellData(DataSheetHeader_FieldName, sheet.Column),
 				FieldType: sheet.GetCellData(DataSheetHeader_FieldType, sheet.Column),
 				FieldMeta: sheet.GetCellData(DataSheetHeader_FieldMeta, sheet.Column),
-				Comment:   sheet.GetCellData(DataSheetHeader_Comment, sheet.Column),
 			}
 
 			if he.FieldName == "" {
@@ -92,11 +89,8 @@ func (self *DataHeader) ParseProtoField(index int, sheet *Sheet, localFD *model.
 		return false
 	}
 
-	if index == 0 {
-		// 添加第一个数据表的定义
-		if !self.makeRowDescriptor(localFD, self.headerFields) {
-			goto ErrorStop
-		}
+	if !self.makeRowDescriptor(localFD, self.headerFields) {
+		goto ErrorStop
 	}
 
 	return true
@@ -217,12 +211,12 @@ func (self *DataHeader) makeRowDescriptor(fileD *model.FileDescriptor, rootField
 
 	rowType := model.NewDescriptor()
 	rowType.Usage = model.DescriptorUsage_RowType
-	rowType.Name = fmt.Sprintf("%sDefine", fileD.Pragma.GetString("TableName"))
+	rowType.Name = fmt.Sprintf("%s", fileD.Pragma.GetString("TableName"))
 	rowType.Kind = model.DescriptorKind_Struct
 
-	// 类型已经存在, 说明是自己定义的 XXDefine, 不允许
+	// 类型已经存在, 说明是自己定义的 XX, 不允许
 	if _, ok := fileD.DescriptorByName[rowType.Name]; ok {
-		glog.Errorf("%s '%s'", "数据头: 使用了保留的类型名 例如:表名+'Define'", rowType.Name)
+		glog.Errorf("%s '%s'", "数据头: 使用了保留的类型名 例如:表名", rowType.Name)
 		return false
 	}
 
@@ -233,6 +227,28 @@ func (self *DataHeader) makeRowDescriptor(fileD *model.FileDescriptor, rootField
 
 		rowType.Add(field)
 	}
+
+	groupType := model.NewDescriptor()
+	groupType.Usage = model.DescriptorUsage_CombineStruct
+	groupType.Name = fmt.Sprintf("%sTable", fileD.Pragma.GetString("TableName"))
+	groupType.Kind = model.DescriptorKind_Struct
+
+	// 类型已经存在, 说明是自己定义的 XX, 不允许
+	if _, ok := fileD.DescriptorByName[groupType.Name]; ok {
+		glog.Errorf("%s '%s'", "数据头: 使用了保留的类型名 例如:表名", rowType.Name)
+		return false
+	}
+
+	rowFD := model.NewFieldDescriptor()
+	rowFD.Name = rowType.Name + "List"
+	rowFD.Type = model.FieldType_Struct
+	rowFD.Complex = rowType
+	rowFD.IsRepeated = true
+	rowFD.Order = 1
+
+	groupType.Add(rowFD)
+
+	fileD.Add(groupType)
 
 	return true
 

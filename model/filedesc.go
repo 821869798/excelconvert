@@ -2,10 +2,11 @@ package model
 
 type FileDescriptor struct {
 	Name             string
+	Package          string
 	DescriptorByName map[string]*Descriptor
 	Descriptors      []*Descriptor
-
-	Pragma *MetaInfo
+	Table            *Table
+	Pragma           *MetaInfo
 }
 
 func (self *FileDescriptor) MatchTag(tag string) bool {
