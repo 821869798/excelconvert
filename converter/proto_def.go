@@ -2,6 +2,7 @@ package converter
 
 import (
 	"bytes"
+	"github.com/821869798/excelconvert/excel"
 	"github.com/821869798/excelconvert/model"
 	"github.com/golang/glog"
 	"github.com/jhump/protoreflect/desc"
@@ -12,13 +13,14 @@ import (
 	"path/filepath"
 )
 
-func buildOneProtoFiler(g *Globals, protoOutPath string, localFD *model.FileDescriptor) (bool, *desc.FileDescriptor) {
+func buildOneProtoFiler(g *Globals, protoOutPath string, efile *excel.File) (bool, *desc.FileDescriptor) {
+	localFD := efile.LocalFD
 	pr := &protoprint.Printer{}
 	Package := localFD.Package
 	ProtoVersion := g.ProtoVersion
-	baseName := localFD.Name + ".proto"
-	fileName := filepath.Join(protoOutPath, baseName)
-	file := builder.NewFile(fileName).SetPackageName(Package).SetProto3(ProtoVersion == 3)
+	baseFileName := efile.BaseFileName + ".proto"
+	fileName := filepath.Join(protoOutPath, baseFileName)
+	file := builder.NewFile(baseFileName).SetPackageName(Package).SetProto3(ProtoVersion == 3)
 	//复杂类型
 	complexMap := make(map[string]interface{})
 	for _, d := range localFD.Descriptors {

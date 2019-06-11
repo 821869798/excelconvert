@@ -54,12 +54,12 @@ func (self *protoConverter) Run(g *Globals, args interface{}) bool {
 	protoOutPath := protpArgs.ProtoOut
 	PbBinaryOutPath := protpArgs.PbBinaryOut
 
-	for _, fd := range g.Files {
-		ok, pfd := buildOneProtoFiler(g, protoOutPath, fd)
+	for _, efile := range g.Files {
+		ok, pfd := buildOneProtoFiler(g, protoOutPath, efile)
 		if !ok {
 			return false
 		}
-		if !buildOneBytesFile(fd.Table, PbBinaryOutPath, pfd) {
+		if !buildOneBytesFile(efile, PbBinaryOutPath, pfd) {
 			return false
 		}
 	}

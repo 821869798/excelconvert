@@ -28,9 +28,8 @@ func NewRecord() *Record {
 }
 
 type Table struct {
-	LocalFD  *FileDescriptor
-	GlobalFD *FileDescriptor
-	Recs     []*Record
+	LocalFD *FileDescriptor
+	Recs    []*Record
 }
 
 func (self *Table) Add(r *Record) {

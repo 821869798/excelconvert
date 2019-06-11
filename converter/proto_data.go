@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"github.com/821869798/excelconvert/excel"
 	"github.com/821869798/excelconvert/model"
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/glog"
@@ -13,9 +14,10 @@ import (
 	"strconv"
 )
 
-func buildOneBytesFile(tab *model.Table, PbBinaryOutPath string, pfd *desc.FileDescriptor) bool {
+func buildOneBytesFile(efile *excel.File, PbBinaryOutPath string, pfd *desc.FileDescriptor) bool {
+	tab := efile.LocalFD.Table
 	localFD := tab.LocalFD
-	baseName := localFD.Name + ".bytes"
+	baseName := efile.BaseFileName + ".bytes"
 	fileName := filepath.Join(PbBinaryOutPath, baseName)
 	//List数据的结构
 	gourpMsg := pfd.FindMessage(fmt.Sprintf("%s.%sTable", localFD.Package, localFD.Name))

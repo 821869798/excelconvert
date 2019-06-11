@@ -4,6 +4,7 @@ import (
 	"github.com/821869798/excelconvert/model"
 	"github.com/golang/glog"
 	"github.com/tealeg/xlsx"
+	"path/filepath"
 	"strings"
 )
 
@@ -14,10 +15,11 @@ type valueRepeatData struct {
 }
 
 type File struct {
-	FileName string
-	LocalFD  *model.FileDescriptor // 本文件的类型描述表
-	GlobalFD *model.FileDescriptor // 全局的类型描述表
-	coreFile *xlsx.File
+	FileName     string                //file完整的路径
+	BaseFileName string                //文件名,不包括后缀
+	LocalFD      *model.FileDescriptor // 本文件的类型描述表
+	GlobalFD     *model.FileDescriptor // 全局的类型描述表
+	coreFile     *xlsx.File
 
 	Header *DataHeader
 	Data   *DataSheet
@@ -30,6 +32,7 @@ func NewFile(filename string) *File {
 		valueRepByKey: make(map[valueRepeatData]bool),
 		LocalFD:       model.NewFileDescriptor(),
 		FileName:      filename,
+		BaseFileName:  strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename)),
 	}
 
 	var err error

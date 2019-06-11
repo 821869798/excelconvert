@@ -38,13 +38,13 @@ func Entry() {
 	}
 
 	//test
-	*paramProtoOut = `./example/protos`
-	*paramPbBinaryOut = `./example/bytes`
-	g.InputFileList = append(g.InputFileList, `./example/example.xlsx`)
+	//*paramProtoOut = `./example/protos`
+	//*paramPbBinaryOut = `./example/bytes`
+	//g.InputFileList = append(g.InputFileList, `./example/example.xlsx`)
 
 	if len(g.InputFileList) == 0 {
 		usage()
-		_, _ = fmt.Fprintln(os.Stderr, "\nnot a excel file input!")
+		_, _ = fmt.Fprintln(os.Stderr, "\nError:not a excel file input!")
 		return
 	}
 
@@ -86,7 +86,7 @@ func StartExport(g *converter.Globals) bool {
 		}
 
 		// 整合类型信息和数据
-		if !g.AddTypes(file.LocalFD) {
+		if !g.AddFile(file) {
 			return false
 		}
 
@@ -107,10 +107,6 @@ func StartExport(g *converter.Globals) bool {
 			return false
 		}
 
-		// 整合类型信息和数据
-		if !g.AddContent(tab) {
-			return false
-		}
 	}
 
 	// 根据各种导出类型, 调用各导出器导出
