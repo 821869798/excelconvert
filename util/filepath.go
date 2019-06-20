@@ -3,6 +3,7 @@ package util
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func GetExcellist(path string) ([]string, error) {
@@ -11,7 +12,8 @@ func GetExcellist(path string) ([]string, error) {
 		if f == nil {
 			return err
 		}
-		if !f.IsDir() && filepath.Ext(path) == ".xlsx" {
+		baseName := filepath.Base(path)
+		if !f.IsDir() && filepath.Ext(path) == ".xlsx" && !strings.HasPrefix(baseName, "~$") {
 			fileLists = append(fileLists, path)
 		}
 		return nil
