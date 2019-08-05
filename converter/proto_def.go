@@ -18,7 +18,7 @@ func buildOneProtoFiler(g *Globals, protoOutPath string, efile *excel.File) (boo
 	pr := &protoprint.Printer{}
 	Package := localFD.Package
 	ProtoVersion := g.ProtoVersion
-	baseFileName := efile.BaseFileName + ".proto"
+	baseFileName := localFD.Name + ".proto"
 	fileName := filepath.Join(protoOutPath, baseFileName)
 	file := builder.NewFile(baseFileName).SetPackageName(Package).SetProto3(ProtoVersion == 3)
 	//复杂类型
